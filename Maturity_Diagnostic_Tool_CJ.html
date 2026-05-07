@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maturity Diagnostic — Teams of Tomorrow</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#034159; --sand:#BFA084; --sage:#A4BF69; --coral:#F2955E; --cream:#E8E6DF;
+  --dark:#2C2C2A; --mgray:#888780; --lgray:#D3D1C7; --white:#FFFFFF;
+  --purple:#534AB7; --green:#1D9E75; --amber:#BA7517; --gold:#C49A3C;
+  --s1:#034159; --s2:#534AB7; --s3:#BA7517; --s4:#1D9E75; --s5:#F2955E; --s6:#C49A3C;
+  --d-complexity:#034159; --d-dialogue:#534AB7; --d-relational:#1D9E75;
+  --d-flexibility:#F2955E; --d-values:#C49A3C; --d-sense:#BA7517;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'DM Sans','Segoe UI',Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--sans);background:var(--cream);color:var(--dark);-webkit-font-smoothing:antialiased;}
+
+/* ── HEADER ── */
+.hdr{background:var(--navy);border-bottom:3px solid var(--sand);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.hdr-brand{color:white;font-size:14px;font-weight:500;}
+.hdr-brand small{color:var(--sand);font-family:var(--serif);font-style:italic;display:block;font-size:12px;}
+.hdr-title{color:white;font-family:var(--serif);font-size:18px;font-weight:500;text-align:center;}
+.hdr-title small{color:var(--sand);font-style:italic;font-size:13px;display:block;}
+
+/* ── HERO ── */
+.hero{background:var(--navy);padding:50px 32px 60px;text-align:center;}
+.hero h1{font-family:var(--serif);font-size:clamp(32px,4vw,50px);font-weight:600;color:white;line-height:1.2;margin-bottom:12px;}
+.hero h1 em{color:var(--sand);font-style:italic;}
+.hero p{color:rgba(255,255,255,.7);font-size:15px;max-width:580px;margin:0 auto 28px;line-height:1.7;}
+.mode-btns{display:inline-flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.mode-btn{border:1.5px solid rgba(191,160,132,.5);border-radius:8px;padding:10px 24px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--sand);background:none;cursor:pointer;transition:all .2s;}
+.mode-btn.active,.mode-btn:hover{background:var(--sand);color:var(--navy);border-color:var(--sand);}
+
+/* ── MAIN ── */
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px 80px;}
+
+/* ── PROGRESS ── */
+.progress-bar{background:white;border-radius:12px;padding:16px 24px;margin:32px 0 0;display:flex;align-items:center;gap:16px;border:1px solid var(--lgray);}
+.prog-track{flex:1;height:6px;background:var(--lgray);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--sand);border-radius:3px;transition:width .3s;}
+.prog-label{font-size:13px;color:var(--mgray);white-space:nowrap;}
+
+/* ── QUESTION CARD ── */
+.q-section{margin-top:24px;}
+.stage-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.stage-pip{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.stage-label{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;}
+.q-card{background:white;border-radius:14px;padding:24px 28px;margin-bottom:12px;border:1.5px solid transparent;transition:border-color .2s;}
+.q-card.answered{border-color:var(--lgray);}
+.q-text{font-size:15px;color:var(--dark);line-height:1.65;margin-bottom:16px;}
+.q-scale{display:flex;gap:6px;flex-wrap:wrap;}
+.q-opt{flex:1;min-width:60px;border:1.5px solid var(--lgray);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .15s;background:none;}
+.q-opt:hover{border-color:var(--sand);background:rgba(191,160,132,.08);}
+.q-opt.selected{border-color:currentColor;background:rgba(0,0,0,.04);}
+.q-opt .val{font-size:16px;font-weight:500;display:block;margin-bottom:2px;}
+.q-opt .lbl{font-size:10px;color:var(--mgray);line-height:1.2;}
+
+/* ── NAV ── */
+.q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:12px;}
+.btn{border:1.5px solid var(--lgray);border-radius:8px;padding:10px 24px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--dark);background:white;cursor:pointer;transition:all .2s;}
+.btn:hover{border-color:var(--sand);}
+.btn.primary{background:var(--navy);color:white;border-color:var(--navy);}
+.btn.primary:hover{background:#023247;}
+.btn:disabled{opacity:.4;cursor:default;}
+
+/* ── RESULTS ── */
+.results{display:none;}
+.results.visible{display:block;}
+.results-hero{background:var(--navy);border-radius:16px;padding:32px;margin-top:32px;text-align:center;}
+.results-hero h2{font-family:var(--serif);font-size:32px;font-weight:600;color:white;margin-bottom:8px;}
+.results-hero p{color:rgba(255,255,255,.7);font-size:14px;line-height:1.7;max-width:500px;margin:0 auto;}
+
+/* ── ROSE TABS ── */
+.rose-tabs{display:flex;gap:4px;background:white;border-radius:10px;padding:5px;border:1px solid var(--lgray);margin:24px 0 0;}
+.rose-tab{flex:1;border:none;border-radius:7px;padding:9px;font-family:var(--sans);font-size:12px;font-weight:500;color:var(--mgray);cursor:pointer;background:none;transition:all .15s;}
+.rose-tab.active{background:var(--navy);color:white;}
+
+/* ── ROSE CONTAINER ── */
+.rose-container{display:grid;grid-template-columns:1fr 280px;gap:24px;align-items:start;margin-top:16px;}
+.rose-svg-wrap{background:white;border-radius:16px;padding:24px;border:1px solid var(--lgray);}
+.rose-legend{background:white;border-radius:16px;padding:20px;border:1px solid var(--lgray);}
+.rose-legend h3{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--dark);margin-bottom:4px;}
+.rose-legend p{font-size:12px;color:var(--mgray);line-height:1.6;margin-bottom:16px;}
+.legend-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--lgray);}
+.legend-item:last-child{border-bottom:none;}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.legend-name{font-size:13px;font-weight:500;color:var(--dark);margin-bottom:1px;}
+.legend-score{font-size:12px;color:var(--mgray);}
+.legend-bar{height:4px;border-radius:2px;margin-top:4px;transition:width .5s;}
+
+/* ── INSIGHTS ── */
+.insights{background:white;border-radius:16px;padding:24px 28px;margin-top:16px;border:1px solid var(--lgray);}
+.insights h3{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--dark);margin-bottom:16px;}
+.insight-row{display:flex;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--lgray);align-items:flex-start;}
+.insight-row:last-child{border-bottom:none;}
+.insight-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.insight-body p{font-size:13px;color:var(--dark);line-height:1.6;}
+.insight-body strong{font-weight:500;}
+
+/* ── DUAL VIEW ── */
+.dual-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+.dual-card{background:white;border-radius:16px;padding:20px;border:1px solid var(--lgray);}
+.dual-card h4{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--dark);margin-bottom:4px;}
+.dual-card p{font-size:12px;color:var(--mgray);margin-bottom:12px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  .rose-container,.dual-grid{grid-template-columns:1fr;}
+  .hdr-title{display:none;}
+  .q-scale{gap:4px;}
+  .q-opt{min-width:45px;}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-brand">Teams of Tomorrow<sup>®</sup><small>Where role meets soul</small></div>
+  <div class="hdr-title">Maturity Diagnostic<small>Leadership &amp; Team</small></div>
+  <div style="font-size:12px;color:var(--sand);">teamsoftomorrow.net</div>
+</header>
+
+<div class="hero">
+  <h1>Your maturity<br><em>diagnostic</em></h1>
+  <p>Two perspectives on where you are in your developmental journey — and where your capacity is richest and where it is asking to grow.</p>
+  <div class="mode-btns">
+    <button class="mode-btn active" id="btn-leader" onclick="setMode('leader')">I am a leader</button>
+    <button class="mode-btn" id="btn-team" onclick="setMode('team')">I am reflecting on my team</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- PROGRESS -->
+  <div class="progress-bar">
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <span class="prog-label" id="prog-label">0 of 27 answered</span>
+  </div>
+
+  <!-- INTRO CARD -->
+  <div id="intro-card" style="background:white;border-radius:14px;padding:28px;margin-top:16px;border:1px solid var(--lgray);">
+    <p style="font-family:var(--serif);font-size:18px;font-weight:500;color:var(--dark);margin-bottom:10px;">Before you begin</p>
+    <p style="font-size:14px;color:var(--mgray);line-height:1.75;margin-bottom:10px;">There are no right or wrong answers here. The diagnostic is designed to reveal where your current capacity is strongest and where it is developing — not to evaluate or compare. Please respond to each statement as honestly as you can, based on your actual experience rather than how you would like things to be.</p>
+    <p style="font-size:14px;color:var(--mgray);line-height:1.75;">Each statement is rated on a scale from <strong style="color:var(--dark);">1 (rarely or not yet)</strong> to <strong style="color:var(--dark);">5 (consistently and naturally)</strong>.</p>
+  </div>
+
+  <!-- QUESTIONS -->
+  <div id="questions-wrap"></div>
+
+  <!-- NAV -->
+  <div class="q-nav" id="q-nav" style="display:none;">
+    <button class="btn" id="btn-prev" onclick="changePage(-1)" disabled>← Previous</button>
+    <span style="font-size:13px;color:var(--mgray);" id="page-label"></span>
+    <button class="btn primary" id="btn-next" onclick="changePage(1)">Next →</button>
+  </div>
+  <div style="text-align:center;margin-top:16px;display:none;" id="submit-wrap">
+    <button class="btn primary" onclick="showResults()" style="padding:12px 40px;font-size:14px;">View my results →</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="results">
+    <div class="results-hero">
+      <h2 id="results-title">Your maturity profile</h2>
+      <p id="results-sub">Two views of where your developmental capacity is richest — and where it is inviting growth.</p>
+    </div>
+
+    <div class="dual-grid">
+      <div class="dual-card">
+        <h4>Stage view</h4>
+        <p>Which maturity stages you most embody right now</p>
+        <svg id="rose-stage" viewBox="0 0 340 340" width="100%" style="display:block;"></svg>
+      </div>
+      <div class="dual-card">
+        <h4>Dimension view</h4>
+        <p>How the six developmental capacities are distributed</p>
+        <svg id="rose-dim" viewBox="0 0 340 340" width="100%" style="display:block;"></svg>
+      </div>
+    </div>
+
+    <!-- Legend row -->
+    <div class="dual-grid" style="margin-top:0;">
+      <div class="dual-card">
+        <p style="font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--mgray);margin-bottom:10px;">Stage scores</p>
+        <div id="stage-legend"></div>
+      </div>
+      <div class="dual-card">
+        <p style="font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--mgray);margin-bottom:10px;">Dimension scores</p>
+        <div id="dim-legend"></div>
+      </div>
+    </div>
+
+    <!-- Insights -->
+    <div class="insights" id="insights-panel">
+      <h3>What your profile suggests</h3>
+      <div id="insights-content"></div>
+    </div>
+
+    <!-- Retake -->
+    <div style="text-align:center;margin-top:24px;">
+      <button class="btn" onclick="resetDiagnostic()">Start again</button>
+      <button class="btn primary" onclick="window.print()" style="margin-left:8px;">Print results</button>
+    </div>
+  </div>
+</div>
+
+<footer style="background:var(--navy);border-top:3px solid var(--sand);padding:24px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+  <p style="color:var(--sand);font-size:12px;">©Teams of Tomorrow® · Maturity Diagnostic · teamsoftomorrow.net</p>
+  <p style="color:rgba(255,255,255,.4);font-size:11px;">Results are for personal development only — not for evaluation or comparison.</p>
+</footer>
+
+<script>
+const STAGE_COLS=["#034159","#534AB7","#BA7517","#1D9E75","#F2955E","#C49A3C"];
+const STAGE_NAMES=["Directive","Consultative","Collaborative","Facilitative","Generative","Mastery"];
+const DIM_COLS={"complexity":"#034159","dialogue":"#534AB7","relational":"#1D9E75","flexibility":"#F2955E","values":"#C49A3C","sense_making":"#BA7517"};
+const DIM_NAMES={"complexity":"Complexity-holding","dialogue":"Dialogue quality","relational":"Relational field","flexibility":"Psychological flexibility","values":"Values-groundedness","sense_making":"Sense-making"};
+const DIM_ORDER=["complexity","dialogue","relational","flexibility","values","sense_making"];
+
+const QUESTIONS={
+  leader:[
+    {id:"L01",stage:1,dim:"complexity",text:"When I face a difficult situation, my first instinct is to apply an approach that has worked before."},
+    {id:"L02",stage:1,dim:"relational",text:"I feel most effective when I am the one providing the direction and others are executing it."},
+    {id:"L03",stage:1,dim:"sense_making",text:"I tend to attribute team friction to insufficient clarity or process rather than to something in the wider system."},
+    {id:"L04",stage:1,dim:"flexibility",text:"I find genuine uncertainty uncomfortable and prefer to resolve it quickly rather than sit with it."},
+    {id:"L05",stage:2,dim:"relational",text:"I regularly ask for input from my team before making significant decisions."},
+    {id:"L06",stage:2,dim:"complexity",text:"I am becoming aware that some challenges in my work do not resolve even when I apply the right process."},
+    {id:"L07",stage:2,dim:"dialogue",text:"I listen carefully to what my team says — though I notice the purpose is usually to inform a decision I will make."},
+    {id:"L08",stage:2,dim:"values",text:"I am beginning to notice moments when my actions feel slightly at odds with what I believe matters most."},
+    {id:"L09",stage:3,dim:"flexibility",text:"I have been able to name — at least privately — that some current demands exceed what I currently know how to do."},
+    {id:"L10",stage:3,dim:"complexity",text:"I can distinguish between problems that need a better solution and problems that require a change in how I think."},
+    {id:"L11",stage:3,dim:"relational",text:"I actively invite my team to share in decisions that I used to make alone."},
+    {id:"L12",stage:3,dim:"values",text:"When I am uncertain what to do, I find myself returning to what I genuinely believe matters — not just what is expected."},
+    {id:"L13",stage:3,dim:"dialogue",text:"I have conversations with my team where I genuinely do not know the answer and say so."},
+    {id:"L14",stage:4,dim:"dialogue",text:"I arrive at significant meetings with questions I genuinely want to explore rather than answers I want to land."},
+    {id:"L15",stage:4,dim:"relational",text:"My team regularly brings me intelligence and perspective that changes how I understand a situation."},
+    {id:"L16",stage:4,dim:"sense_making",text:"I pay attention to weak signals — changes in energy, things left unsaid, patterns in behaviour — as information about the system."},
+    {id:"L17",stage:4,dim:"flexibility",text:"I find I can sit with genuinely unresolvable complexity without needing to force a conclusion."},
+    {id:"L18",stage:4,dim:"complexity",text:"I treat wicked problems as something to inhabit and explore collectively rather than to solve individually."},
+    {id:"L19",stage:5,dim:"sense_making",text:"My team and I regularly notice and name what is happening in our system without waiting for a crisis to make it visible."},
+    {id:"L20",stage:5,dim:"relational",text:"I experience my development as inseparable from the team's — we grow together rather than me developing separately."},
+    {id:"L21",stage:5,dim:"dialogue",text:"Conversations in my team regularly produce understanding that I couldn't have reached alone — something genuinely new emerges."},
+    {id:"L22",stage:5,dim:"values",text:"The team's shared sense of purpose and values operates as a living navigational guide, not a statement on a wall."},
+    {id:"L23",stage:6,dim:"relational",text:"The distinction between my role and my team's has become less important than the quality of what we create together."},
+    {id:"L24",stage:6,dim:"flexibility",text:"I experience genuine uncertainty as generative — the place where the most interesting thinking happens — rather than something to resolve."},
+    {id:"L25",stage:6,dim:"dialogue",text:"There are moments in our collective work where something arises that no one can fully account for — a quality of shared wisdom."},
+    {id:"L26",stage:6,dim:"values",text:"I genuinely care about each person in my team's flourishing as an end in itself — not as a means to performance."},
+    {id:"L27",stage:6,dim:"sense_making",text:"My team and I inhabit complexity together — it is our home ground, not a challenge we are managing."}
+  ],
+  team:[
+    {id:"T01",stage:1,dim:"relational",text:"The team tends to wait for the leader to define what needs to happen before acting."},
+    {id:"T02",stage:1,dim:"complexity",text:"When genuinely uncertain situations arise, the team's instinct is to pass them upward rather than work with them collectively."},
+    {id:"T03",stage:1,dim:"flexibility",text:"The team's sense of safety depends significantly on the leader having clear answers."},
+    {id:"T04",stage:1,dim:"dialogue",text:"Most team meetings are structured around updates and decisions rather than genuine collective inquiry."},
+    {id:"T05",stage:2,dim:"relational",text:"Team members offer perspectives and opinions when invited, though challenge remains tentative."},
+    {id:"T06",stage:2,dim:"sense_making",text:"The team is beginning to notice patterns in its own work, though it still tends to look to the leader for interpretation."},
+    {id:"T07",stage:2,dim:"dialogue",text:"There are moments in team conversations when something more open is possible — though it depends on who is in the room."},
+    {id:"T08",stage:2,dim:"flexibility",text:"The team can hold moderate uncertainty — provided it expects the leader to resolve it within a reasonable timeframe."},
+    {id:"T09",stage:3,dim:"complexity",text:"The team takes genuine co-responsibility for navigating complex situations — not delegating them upward."},
+    {id:"T10",stage:3,dim:"dialogue",text:"The team can genuinely suspend its assumptions in conversation — entertaining ideas that challenge its current understanding."},
+    {id:"T11",stage:3,dim:"relational",text:"Team members challenge the leader's thinking openly and constructively — and the leader receives this as useful rather than resistance."},
+    {id:"T12",stage:3,dim:"flexibility",text:"Being safe enough to engage honestly is becoming a shared norm in the team — not something each person manages individually."},
+    {id:"T13",stage:3,dim:"values",text:"The team has a shared sense of what matters and why — and this operates as a navigational resource in difficult moments."},
+    {id:"T14",stage:4,dim:"sense_making",text:"The team regularly notices and names what is happening in its own system — without prompting from the leader or a facilitator."},
+    {id:"T15",stage:4,dim:"dialogue",text:"Genuine dialogue — thinking together toward something none of us knew before — happens in this team with some regularity."},
+    {id:"T16",stage:4,dim:"complexity",text:"The team actively seeks out the edge of its current capacity — treating genuine complexity as interesting rather than threatening."},
+    {id:"T17",stage:4,dim:"relational",text:"The team generates its own developmental questions without depending on the leader to identify them."},
+    {id:"T18",stage:4,dim:"flexibility",text:"The team can engage with genuinely difficult material — including challenges to how it operates — without fragmenting."},
+    {id:"T19",stage:5,dim:"sense_making",text:"New capacity appears in this team that no individual can fully account for — something emerges collectively that wasn't brought into the room."},
+    {id:"T20",stage:5,dim:"relational",text:"The boundary between the team's work and the team's development has effectively dissolved — we develop by working."},
+    {id:"T21",stage:5,dim:"dialogue",text:"The team regularly surprises itself — conversations produce understanding that feels genuinely emergent."},
+    {id:"T22",stage:5,dim:"values",text:"The team's shared purpose is felt rather than stated — it shapes behaviour without needing to be referenced."},
+    {id:"T23",stage:6,dim:"relational",text:"Team members genuinely care about each other's flourishing as people — not just as contributors to shared goals."},
+    {id:"T24",stage:6,dim:"flexibility",text:"The team inhabits uncertainty as its natural state — complexity is not something we manage, it is where we live and think."},
+    {id:"T25",stage:6,dim:"dialogue",text:"There are moments in our collective work where a quality of shared wisdom arises that none of us could claim as our own."},
+    {id:"T26",stage:6,dim:"values",text:"The wellbeing of the team and the wellbeing of each individual feel genuinely inseparable — what is good for one is good for all."},
+    {id:"T27",stage:6,dim:"sense_making",text:"The team transforms its relationship to complexity rather than navigating through it — we become different by engaging with it."}
+  ]
+};
+
+const SCALE_LABELS=["Rarely","Occasionally","Sometimes","Often","Consistently"];
+const PAGE_SIZE=5;
+
+let mode='leader';
+let answers={};
+let currentPage=0;
+
+function setMode(m){
+  mode=m;
+  answers={};
+  currentPage=0;
+  document.getElementById('btn-leader').classList.toggle('active',m==='leader');
+  document.getElementById('btn-team').classList.toggle('active',m==='team');
+  document.getElementById('results').classList.remove('visible');
+  renderPage();
+}
+
+function getQs(){return QUESTIONS[mode];}
+
+function totalPages(){return Math.ceil(getQs().length/PAGE_SIZE);}
+
+function renderPage(){
+  const qs=getQs();
+  const start=currentPage*PAGE_SIZE;
+  const pageQs=qs.slice(start,start+PAGE_SIZE);
+  const wrap=document.getElementById('questions-wrap');
+  wrap.innerHTML='';
+  document.getElementById('q-nav').style.display='flex';
+  document.getElementById('intro-card').style.display=currentPage===0?'block':'none';
+
+  pageQs.forEach((q,i)=>{
+    const idx=start+i;
+    const card=document.createElement('div');
+    card.className='q-card'+(answers[q.id]?' answered':'');
+    card.id='qcard-'+q.id;
+    const stageI=q.stage-1;
+    card.innerHTML=`
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:${STAGE_COLS[stageI]};flex-shrink:0;"></div>
+        <span style="font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:${STAGE_COLS[stageI]};">Stage ${q.stage} · ${DIM_NAMES[q.dim]}</span>
+        <span style="font-size:11px;color:var(--lgray);margin-left:auto;">${idx+1} / ${qs.length}</span>
+      </div>
+      <p class="q-text">${q.text}</p>
+      <div class="q-scale" id="scale-${q.id}"></div>`;
+    const scale=card.querySelector('.q-scale');
+    [1,2,3,4,5].forEach(v=>{
+      const opt=document.createElement('div');
+      opt.className='q-opt'+(answers[q.id]===v?' selected':'');
+      opt.style.color=STAGE_COLS[stageI];
+      opt.innerHTML=`<span class="val">${v}</span><span class="lbl">${SCALE_LABELS[v-1]}</span>`;
+      opt.onclick=()=>selectAnswer(q.id,v,stageI);
+      scale.appendChild(opt);
+    });
+    wrap.appendChild(card);
+  });
+
+  updateProgress();
+  updateNav();
+}
+
+function selectAnswer(id,val,stageI){
+  answers[id]=val;
+  const scale=document.getElementById('scale-'+id);
+  scale.querySelectorAll('.q-opt').forEach((o,i)=>{
+    o.classList.toggle('selected',i+1===val);
+  });
+  document.getElementById('qcard-'+id).classList.add('answered');
+  updateProgress();
+  updateNav();
+}
+
+function updateProgress(){
+  const qs=getQs();
+  const done=qs.filter(q=>answers[q.id]).length;
+  const pct=Math.round(done/qs.length*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=`${done} of ${qs.length} answered`;
+}
+
+function updateNav(){
+  const tp=totalPages();
+  const prev=document.getElementById('btn-prev');
+  const next=document.getElementById('btn-next');
+  const sub=document.getElementById('submit-wrap');
+  const nav=document.getElementById('q-nav');
+  prev.disabled=currentPage===0;
+  const isLast=currentPage===tp-1;
+  const pageQs=getQs().slice(currentPage*PAGE_SIZE,(currentPage+1)*PAGE_SIZE);
+  const allAnswered=pageQs.every(q=>answers[q.id]);
+  if(isLast){
+    next.style.display='none';
+    sub.style.display=allAnswered?'block':'none';
+    nav.style.justifyContent='flex-start';
+  } else {
+    next.style.display='block';
+    sub.style.display='none';
+    nav.style.justifyContent='space-between';
+    next.disabled=!allAnswered;
+  }
+  document.getElementById('page-label').textContent=`Page ${currentPage+1} of ${tp}`;
+}
+
+function changePage(dir){
+  currentPage+=dir;
+  currentPage=Math.max(0,Math.min(totalPages()-1,currentPage));
+  renderPage();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── SCORING ──
+function computeScores(){
+  const qs=getQs();
+  const stageScores=[0,0,0,0,0,0];
+  const stageCounts=[0,0,0,0,0,0];
+  const dimScores={complexity:0,dialogue:0,relational:0,flexibility:0,values:0,sense_making:0};
+  const dimCounts={complexity:0,dialogue:0,relational:0,flexibility:0,values:0,sense_making:0};
+  qs.forEach(q=>{
+    const v=answers[q.id]||0;
+    stageScores[q.stage-1]+=v;
+    stageCounts[q.stage-1]++;
+    dimScores[q.dim]+=v;
+    dimCounts[q.dim]++;
+  });
+  const stageAvg=stageScores.map((s,i)=>stageCounts[i]?s/stageCounts[i]:0);
+  const dimAvg={};
+  Object.keys(dimScores).forEach(k=>{dimAvg[k]=dimCounts[k]?dimScores[k]/dimCounts[k]:0;});
+  return{stageAvg,dimAvg};
+}
+
+// ── ROSE DIAGRAM ──
+function drawRose(svgId,arms,colors,labels,scores){
+  const svg=document.getElementById(svgId);
+  svg.innerHTML='';
+  const cx=170,cy=170,maxR=130,nSegs=6,arms6=arms;
+  const angleStep=(2*Math.PI)/arms6;
+
+  // Background rings
+  for(let r=1;r<=nSegs;r++){
+    const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx',cx);circle.setAttribute('cy',cy);
+    circle.setAttribute('r',r*maxR/nSegs);
+    circle.setAttribute('fill','none');circle.setAttribute('stroke','#E8E6DF');circle.setAttribute('stroke-width','0.5');
+    svg.appendChild(circle);
+  }
+
+  // Axis lines
+  for(let i=0;i<arms6;i++){
+    const angle=i*angleStep-Math.PI/2;
+    const x=cx+Math.cos(angle)*maxR;
+    const y=cy+Math.sin(angle)*maxR;
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',cx);line.setAttribute('y1',cy);
+    line.setAttribute('x2',x);line.setAttribute('y2',y);
+    line.setAttribute('stroke','#D3D1C7');line.setAttribute('stroke-width','0.5');
+    svg.appendChild(line);
+  }
+
+  // Filled sectors
+  scores.forEach((score,i)=>{
+    const r=score/5*maxR;
+    if(r<1)return;
+    const angleStart=i*angleStep-Math.PI/2-angleStep/2;
+    const angleEnd=i*angleStep-Math.PI/2+angleStep/2;
+    const gap=0.05;
+    const x1=cx+Math.cos(angleStart+gap)*r;
+    const y1=cy+Math.sin(angleStart+gap)*r;
+    const x2=cx+Math.cos(angleEnd-gap)*r;
+    const y2=cy+Math.sin(angleEnd-gap)*r;
+    const largeArc=angleEnd-angleStart-2*gap>Math.PI?1:0;
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',`M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`);
+    path.setAttribute('fill',colors[i]);path.setAttribute('fill-opacity','0.75');
+    path.setAttribute('stroke',colors[i]);path.setAttribute('stroke-width','1');
+    svg.appendChild(path);
+
+    // Segment notches
+    for(let s=1;s<=nSegs;s++){
+      const sr=s*maxR/nSegs;
+      if(sr>r)break;
+      const nx1=cx+Math.cos(angleStart+gap)*sr;
+      const ny1=cy+Math.sin(angleStart+gap)*sr;
+      const nx2=cx+Math.cos(angleEnd-gap)*sr;
+      const ny2=cy+Math.sin(angleEnd-gap)*sr;
+      const narc=document.createElementNS('http://www.w3.org/2000/svg','path');
+      narc.setAttribute('d',`M ${nx1} ${ny1} A ${sr} ${sr} 0 0 1 ${nx2} ${ny2}`);
+      narc.setAttribute('fill','none');narc.setAttribute('stroke',colors[i]);
+      narc.setAttribute('stroke-width','0.5');narc.setAttribute('stroke-opacity','0.4');
+      svg.appendChild(narc);
+    }
+  });
+
+  // Centre dot
+  const cdot=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  cdot.setAttribute('cx',cx);cdot.setAttribute('cy',cy);cdot.setAttribute('r','3');
+  cdot.setAttribute('fill','#888780');svg.appendChild(cdot);
+
+  // Labels
+  labels.forEach((lbl,i)=>{
+    const angle=i*angleStep-Math.PI/2;
+    const lr=maxR+22;
+    const lx=cx+Math.cos(angle)*lr;
+    const ly=cy+Math.sin(angle)*lr;
+    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x',lx);txt.setAttribute('y',ly);
+    txt.setAttribute('text-anchor','middle');txt.setAttribute('dominant-baseline','central');
+    txt.setAttribute('font-size','9.5');txt.setAttribute('font-family',"'DM Sans',Arial,sans-serif");
+    txt.setAttribute('font-weight','500');txt.setAttribute('fill',colors[i]);
+    const lines=lbl.split('\n');
+    if(lines.length===1){txt.textContent=lbl;}
+    else{
+      lines.forEach((ln,li)=>{
+        const ts=document.createElementNS('http://www.w3.org/2000/svg','tspan');
+        ts.setAttribute('x',lx);ts.setAttribute('dy',li===0?'0':'1.2em');
+        ts.textContent=ln;txt.appendChild(ts);
+      });
+    }
+    svg.appendChild(txt);
+
+    // Score badge
+    const scoreR=maxR*scores[i]/5+12;
+    const sx=cx+Math.cos(angle)*scoreR;
+    const sy=cy+Math.sin(angle)*scoreR;
+    if(scores[i]>0.5){
+      const circ=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      circ.setAttribute('cx',sx);circ.setAttribute('cy',sy);circ.setAttribute('r','9');
+      circ.setAttribute('fill',colors[i]);svg.appendChild(circ);
+      const stxt=document.createElementNS('http://www.w3.org/2000/svg','text');
+      stxt.setAttribute('x',sx);stxt.setAttribute('y',sy);
+      stxt.setAttribute('text-anchor','middle');stxt.setAttribute('dominant-baseline','central');
+      stxt.setAttribute('font-size','8');stxt.setAttribute('font-family',"'DM Sans',Arial,sans-serif");
+      stxt.setAttribute('font-weight','500');stxt.setAttribute('fill','white');
+      stxt.textContent=scores[i].toFixed(1);svg.appendChild(stxt);
+    }
+  });
+}
+
+function buildLegend(elId,names,colors,scores){
+  const el=document.getElementById(elId);
+  el.innerHTML='';
+  names.forEach((n,i)=>{
+    const pct=Math.round(scores[i]/5*100);
+    const div=document.createElement('div');
+    div.className='legend-item';
+    div.innerHTML=`
+      <div class="legend-dot" style="background:${colors[i]};"></div>
+      <div style="flex:1;">
+        <div class="legend-name">${n}</div>
+        <div class="legend-score" style="color:${colors[i]};">${scores[i].toFixed(1)} / 5 &nbsp;·&nbsp; ${pct}%</div>
+        <div style="height:4px;border-radius:2px;background:var(--lgray);margin-top:4px;">
+          <div style="width:${pct}%;height:100%;border-radius:2px;background:${colors[i]};transition:width .5s;"></div>
+        </div>
+      </div>`;
+    el.appendChild(div);
+  });
+}
+
+function getPrimaryStage(stageAvg){
+  // Primary stage is weighted toward higher stages:
+  // find the highest stage with a score >= 3.0, else the highest overall
+  for(let i=5;i>=0;i--){if(stageAvg[i]>=3.0)return i;}
+  return stageAvg.indexOf(Math.max(...stageAvg));
+}
+
+const STAGE_DESC={
+  leader:{
+    0:"You lead primarily from expertise and authority. Your clarity and decisiveness are genuine strengths. The invitation at this stage is to notice what the team knows that you don't yet — and to begin creating space for that knowledge to reach you.",
+    1:"You are beginning to consult and invite. You're recognising that some challenges don't resolve through the usual approaches — and that the team holds intelligence worth drawing on. This awareness is itself a significant developmental step.",
+    2:"You are at or near the activation threshold — the most pivotal moment in the framework. You are beginning to name what you don't yet know, and to redistribute the sense-making work. This takes genuine courage. It is the precondition for everything that follows.",
+    3:"You are leading as a facilitator — holding the space for collective intelligence rather than providing answers. Your primary contribution is the quality of the questions you ask and the conditions you create. The team's development and yours are becoming genuinely reciprocal.",
+    4:"You and your team are operating as a learning system. Development is no longer a project — it is how you work together. New understanding regularly emerges that none of you could have reached alone.",
+    5:"The role and the soul have become integrated. Leadership at this stage is a quality of collective action rather than individual authority. The team exists as a community of shared values and mutual care — a genuinely rare and remarkable achievement."
+  },
+  team:{
+    0:"The team currently operates in a dependent mode — drawing its safety and direction from the leader's certainty. This is a legitimate and functional starting point. The invitation is to begin noticing the collective intelligence that is already present but not yet fully expressed.",
+    1:"The team is beginning to contribute and participate — bringing knowledge and perspective when invited. Challenge is emerging, tentatively. The team is developing a sense that its intelligence matters.",
+    2:"The team is at or near the collaborative threshold — beginning to accept genuine co-responsibility for navigating complexity. This stage is only accessible when the leader has also crossed their own capacity deficit threshold. Both movements are required.",
+    3:"The team is co-creating — actively generating its own developmental questions, self-initiating sense-making, and producing collective understanding that no individual could have reached. The boundary between leader and team as sense-makers is becoming genuinely permeable.",
+    4:"The team operates as a living learning system. Development is indistinguishable from the work itself. New capacity appears that no individual can fully account for. The team regularly surprises itself.",
+    5:"The team has become a community of wisdom — sharing values, mutual care, and a collective presence in complexity that is genuinely greater than the sum of its parts. Ubuntu: the individual's flourishing and the team's are experienced as one."
+  }
+};
+
+function generateInsights(stageAvg,dimAvg){
+  const el=document.getElementById('insights-content');
+  el.innerHTML='';
+  const primaryStage=getPrimaryStage(stageAvg);
+  const minDim=Object.entries(dimAvg).sort((a,b)=>a[1]-b[1])[0];
+  const maxDim=Object.entries(dimAvg).sort((a,b)=>b[1]-a[1])[0];
+
+  // Profile summary
+  const summary=document.createElement('div');
+  summary.style.cssText='background:linear-gradient(135deg,'+STAGE_COLS[primaryStage]+'10,transparent);border-left:3px solid'+STAGE_COLS[primaryStage]+';padding:14px 16px;margin-bottom:16px;border-radius:0 8px 8px 0;';
+  summary.innerHTML=`<p style="font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:${STAGE_COLS[primaryStage]};margin-bottom:6px;">YOUR PROFILE — STAGE ${primaryStage+1} · ${STAGE_NAMES[primaryStage].toUpperCase()}</p><p style="font-size:14px;color:#2C2C2A;line-height:1.7;">${STAGE_DESC[mode][primaryStage]}</p>`;
+  el.appendChild(summary);
+
+  const insights=[
+    {
+      col:STAGE_COLS[primaryStage],
+      bg:STAGE_COLS[primaryStage]+'12',
+      label:'Reading the stage view',
+      text:`Your stage rose shows where your current capacity is most naturally expressed. A high arm at stage ${primaryStage+1} indicates that the behaviours and orientations of that stage are alive and active in your work. Lower arms at higher stages are not deficits — they describe where development is still unfolding. A small, coherent rose is as healthy as a large one: what matters is the honesty of the shape.`
+    },
+    {
+      col:DIM_COLS[maxDim[0]],
+      bg:DIM_COLS[maxDim[0]]+'12',
+      label:'Your strongest dimension — '+DIM_NAMES[maxDim[0]],
+      text:`This is a genuine asset in your current work. A score of ${dimAvg[maxDim[0]].toFixed(1)} suggests this capacity is well developed and likely already influencing how you hold complexity and relate to ${mode==='leader'?'your team':'the leader'}. Notice where this strength is most active — and where it might be brought more deliberately to support the dimensions that are still developing.`
+    },
+    {
+      col:DIM_COLS[minDim[0]],
+      bg:DIM_COLS[minDim[0]]+'12',
+      label:'Growing edge — '+DIM_NAMES[minDim[0]],
+      text:`A score of ${dimAvg[minDim[0]].toFixed(1)} here suggests this dimension is at an earlier point in its development. This is not a gap to be closed urgently — it is the living edge of your current capacity. The maturity framework's developmental attributes offer a starting point for understanding what conditions would support this dimension to deepen. In Teams of Tomorrow's twelve-week programme, this is precisely the kind of developmental edge the peer group works with.`
+    },
+    {
+      col:'#BFA084',
+      bg:'rgba(191,160,132,0.1)',
+      label:'How to read both roses together',
+      text:`The stage view tells you where you are on the developmental journey. The dimension view tells you which specific capacities are richest and which are inviting growth — regardless of stage. A leader at stage 3 with a strong dialogue dimension and a developing flexibility dimension will navigate their current threshold very differently from a leader at the same stage with the reverse profile. Both roses together give the most useful picture.`
+    }
+  ];
+
+  insights.forEach(ins=>{
+    const row=document.createElement('div');
+    row.className='insight-row';
+    row.innerHTML=`
+      <div style="width:4px;min-width:4px;border-radius:2px;background:${ins.col};align-self:stretch;"></div>
+      <div class="insight-body" style="padding-left:4px;">
+        <p style="font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:${ins.col};margin-bottom:4px;">${ins.label}</p>
+        <p>${ins.text}</p>
+      </div>`;
+    el.appendChild(row);
+  });
+
+  // ToT invitation
+  const invite=document.createElement('div');
+  invite.style.cssText='background:var(--navy);border-radius:10px;padding:16px 18px;margin-top:16px;';
+  invite.innerHTML=`<p style="font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--sand);margin-bottom:6px;">TEAMS OF TOMORROW</p><p style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.7;margin-bottom:10px;">This diagnostic is a starting point, not a destination. The deepest developmental work happens in relationship — with peers who are navigating genuinely similar terrain, in a space where the not-yet-known is the shared orientation rather than something to be resolved. That is what Teams of Tomorrow is designed to provide.</p><a href="https://teamsoftomorrow.net" style="display:inline-block;border:1px solid var(--sand);border-radius:6px;padding:7px 18px;font-size:12px;font-weight:500;color:var(--sand);text-decoration:none;">Learn more → teamsoftomorrow.net</a>`;
+  el.appendChild(invite);
+}
+
+function showResults(){
+  const{stageAvg,dimAvg}=computeScores();
+  document.getElementById('results').classList.add('visible');
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+
+  // Stage rose
+  const stageLabels=STAGE_NAMES.map((n,i)=>`S${i+1}\n${n.split(' ')[0]}`);
+  drawRose('rose-stage',6,STAGE_COLS,stageLabels,stageAvg);
+
+  // Dimension rose
+  const dimScores=DIM_ORDER.map(k=>dimAvg[k]);
+  const dimColors=DIM_ORDER.map(k=>DIM_COLS[k]);
+  const dimLabels=DIM_ORDER.map(k=>DIM_NAMES[k].replace(' ','\n'));
+  drawRose('rose-dim',6,dimColors,dimLabels,dimScores);
+
+  // Legends
+  buildLegend('stage-legend',STAGE_NAMES,STAGE_COLS,stageAvg);
+  buildLegend('dim-legend',DIM_ORDER.map(k=>DIM_NAMES[k]),dimColors,dimScores);
+
+  // Insights
+  generateInsights(stageAvg,dimAvg);
+
+  // Results title
+  document.getElementById('results-title').textContent=
+    mode==='leader'?'Your leadership maturity profile':'Your team maturity profile';
+}
+
+function resetDiagnostic(){
+  answers={};currentPage=0;
+  document.getElementById('results').classList.remove('visible');
+  renderPage();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Init
+renderPage();
+</script>
+</body>
+</html>
